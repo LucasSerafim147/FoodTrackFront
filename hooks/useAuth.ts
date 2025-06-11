@@ -7,5 +7,20 @@ export const login = async (email: string, senha: string) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, senha }),
     });
-  } catch (error) {}
+
+    const data = await response.json();
+
+    if(!response.ok){
+      await AsyncStorage.setItem("token", data.token);
+      return { success: true };
+    } else {
+      return { success: false, message: data.message };
+    }
+  } catch (error) {
+    return { success: false, message: "Erro de rede" };
+  }
+};
+
+export const logout = async () => {
+  await AsyncStorage.removeItem("token");
 };
