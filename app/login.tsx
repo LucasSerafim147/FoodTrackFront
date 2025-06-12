@@ -1,62 +1,53 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Image,
   Alert,
 } from 'react-native';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons as Icon } from '@expo/vector-icons';
+import { login } from '@/hooks/useAuth';
 
 const loginValidationSchema = yup.object().shape({
   email: yup
     .string()
     .email('Por favor, insira um email válido')
-    .required('Email é obrigatório'),
-  password: yup
+    .required('Email é obrigatório')
+    .trim(),
+  senha: yup
     .string()
     .min(6, ({ min }) => `A senha precisa ter pelo menos ${min} caracteres`)
-    .required('Senha é obrigatória'),
+    .required('Senha é obrigatória')
+    .trim(),
 });
 
 export default function LoginScreen() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (values: { email: string; password: string }) => {
-    try {
-      const response = await fetch('http://localhost:3000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: values.email, senha: values.password }),
-      });
+  const handleLogin = async (values: { email: string; senha: string }) => {
+    setLoading(true);
+    const result = await login(values.email, values.senha);
+    setLoading(false);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        await AsyncStorage.setItem('token', data.token);
-        router.replace('/homeScreen');
-      } else {
-        Alert.alert('Erro', data.message || 'Erro ao fazer login');
-      }
-    } catch (error) {
-      Alert.alert('Erro', 'Erro de conexão com o servidor');
+    if (result.success) {
+      router.replace('/homeScreen');
+    } else {
+      Alert.alert('Erro', result.message || 'Erro ao fazer login');
     }
   };
 
   return (
     <View style={styles.container}>
-     
       <Text style={styles.title}>Login</Text>
-
       <Formik
         validationSchema={loginValidationSchema}
-        initialValues={{ email: '', password: '' }}
+        initialValues={{ email: '', senha: '' }}
         onSubmit={handleLogin}
       >
         {({
@@ -91,24 +82,24 @@ export default function LoginScreen() {
                 style={styles.input}
                 placeholder="Senha"
                 secureTextEntry
-                onChangeText={handleChange('password')}
-                onBlur={handleBlur('password')}
-                value={values.password}
+                onChangeText={handleChange('senha')}
+                onBlur={handleBlur('senha')}
+                value={values.senha}
               />
             </View>
-            {errors.password && touched.password && (
-              <Text style={styles.errorText}>{errors.password}</Text>
+            {errors.senha && touched.senha && (
+              <Text style={styles.errorText}>{errors.senha}</Text>
             )}
 
             <TouchableOpacity
-              style={styles.button}
-              onPress={handleSubmit as () => void}
-              disabled={!isValid}
+              style={[styles.button, { opacity: isValid && !loading ? 1 : 0.5 }]}
+              onPress={() => handleSubmit()}
+              disabled={!isValid || loading}
             >
-              <Text style={styles.buttonText}>Entrar</Text>
+              <Text style={styles.buttonText}>{loading ? 'Carregando...' : 'Entrar'}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => router.push('/registerScreen')}>
+            <TouchableOpacity onPress={() => router.push('/register')}>
               <Text style={styles.signUp}>
                 Não tem uma conta?{' '}
                 <Text style={styles.signUpLink}>Cadastre-se</Text>
@@ -128,12 +119,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     paddingHorizontal: 20,
-  },
-  logo: {
-    height: 200,
-    width: 200,
-    resizeMode: 'contain',
-    marginBottom: 20,
   },
   title: {
     fontSize: 32,

@@ -22,7 +22,7 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ title: 'Criar Conta' }} />
-        <Stack.Screen name="home" options={{ title: 'Início' }} />
+        <Stack.Screen name="homeScreen" options={{ title: 'Início' }} />
         <Stack.Screen name="meals" options={{ title: 'Refeições' }} />
         <Stack.Screen name="novaMeal" options={{ title: 'Nova Refeição' }} />
         <Stack.Screen name="+not-found" />
