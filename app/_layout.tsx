@@ -1,3 +1,4 @@
+// app/_layout.tsx
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -13,9 +14,7 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  if (!loaded) {
-    return null;
-  }
+  if (!loaded) return null;
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
@@ -25,9 +24,9 @@ export default function RootLayout() {
         <Stack.Screen name="homeScreen" options={{ title: 'Início' }} />
         <Stack.Screen name="meals" options={{ title: 'Refeições' }} />
         <Stack.Screen name="novaMeal" options={{ title: 'Nova Refeição' }} />
-        <Stack.Screen name="+not-found" />
+       
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
     </ThemeProvider>
   );
 }
