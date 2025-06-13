@@ -24,7 +24,6 @@ export default function RootLayout() {
         <Stack.Screen name="homeScreen" options={{ title: 'Início' }} />
         <Stack.Screen name="meals" options={{ title: 'Refeições' }} />
         <Stack.Screen name="novaMeal" options={{ title: 'Nova Refeição' }} />
-       
       </Stack>
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
     </ThemeProvider>
